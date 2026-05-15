@@ -148,7 +148,7 @@ div[data-testid="stSidebar"] label {
 h1 {
     font-size: 1.6rem !important;
     font-weight: 600 !important;
-    color: #f9fafb !important;
+    color: #0f1117 !important;
     letter-spacing: -0.02em;
 }
 
