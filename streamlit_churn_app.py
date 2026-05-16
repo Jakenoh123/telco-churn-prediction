@@ -114,7 +114,7 @@ html, body, [class*="css"] {
 .sidebar-header {
     font-size: 1.1rem;
     font-weight: 600;
-    color: #f9fafb;
+    color: #111827;
     margin-bottom: 1rem;
 }
 
@@ -155,7 +155,7 @@ h1 {
 h3 {
     font-size: 0.95rem !important;
     font-weight: 600 !important;
-    color: #e5e7eb !important;
+    color: #111827 !important;
     letter-spacing: 0.01em;
 }
 
@@ -238,7 +238,6 @@ def preprocess_input(raw_df: pd.DataFrame):
 def preprocess_batch(raw_df: pd.DataFrame):
     df = raw_df.copy()
 
-    # Drop unnecessary columns
     if "customerID" in df.columns:
         df.drop(columns=["customerID"], inplace=True)
     if "Churn" in df.columns:
@@ -247,7 +246,6 @@ def preprocess_batch(raw_df: pd.DataFrame):
     df["TotalCharges"] = pd.to_numeric(df["TotalCharges"], errors="coerce")
     df["TotalCharges"].fillna(df["TotalCharges"].median(), inplace=True)
 
-    # Feature engineering
     df["tenure_group"] = pd.cut(
         df["tenure"], bins=[0, 12, 24, 48, 72],
         labels=["0-12", "12-24", "24-48", "48+"], include_lowest=True
@@ -292,7 +290,7 @@ st.divider()
 tab1, tab2 = st.tabs(["👤 Individual Prediction", "📂 Batch CSV Prediction"])
 
 # ══════════════════════════════════════════════════════════════════════════════
-# TAB 1 — Individual Prediction (기존 코드 그대로)
+# TAB 1 — Individual Prediction
 # ══════════════════════════════════════════════════════════════════════════════
 with tab1:
     with st.sidebar:
@@ -501,7 +499,7 @@ with tab1:
                 st.dataframe(input_df, use_container_width=True)
 
 # ══════════════════════════════════════════════════════════════════════════════
-# TAB 2 — Batch CSV Prediction (신규)
+# TAB 2 — Batch CSV Prediction
 # ══════════════════════════════════════════════════════════════════════════════
 with tab2:
     st.markdown("### 📂 Batch Customer Prediction")
@@ -534,7 +532,6 @@ with tab2:
 
                 st.divider()
 
-                # ── Summary stats ─────────────────────────────────────────────
                 st.markdown("### 📊 Prediction Summary")
                 total      = len(result_df)
                 n_churn    = int(preds.sum())
@@ -558,7 +555,6 @@ with tab2:
 
                 st.divider()
 
-                # ── Risk distribution chart ───────────────────────────────────
                 st.markdown("### 📈 Risk Level Distribution")
                 fig, ax = plt.subplots(figsize=(6, 3))
                 fig.patch.set_facecolor("#1a1d27")
@@ -586,7 +582,6 @@ with tab2:
 
                 st.divider()
 
-                # ── High risk table ───────────────────────────────────────────
                 st.markdown("### 🔴 High Risk Customers (≥ 65% churn probability)")
                 high_risk = result_df[result_df["Churn_Probability%"] >= 65].sort_values(
                     "Churn_Probability%", ascending=False).reset_index(drop=True)
@@ -599,14 +594,12 @@ with tab2:
 
                 st.divider()
 
-                # ── Full results ──────────────────────────────────────────────
                 st.markdown("### 📋 Full Prediction Results")
                 st.dataframe(
                     result_df.sort_values("Churn_Probability%", ascending=False),
                     use_container_width=True
                 )
 
-                # ── Download ──────────────────────────────────────────────────
                 csv_out = result_df.sort_values("Churn_Probability%", ascending=False).to_csv(index=False)
                 st.download_button(
                     label="⬇️ Download Full Results as CSV",
